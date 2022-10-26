@@ -3,8 +3,8 @@ import pandas as pd
 from datetime import date, datetime
 import matplotlib.pyplot as plt
 
-# not perfect because cpi package doesn't have march yet
-inflation_date = date(2022, 2, 1)
+# not perfect because cpi package doesn't have october yet
+inflation_date = date(2022, 8, 1)
 
 prices = pd.read_csv("gas_prices_trimmed.csv", usecols = ['Date','Cost'], parse_dates=['Date'])
 
@@ -25,8 +25,10 @@ for index, row in prices.iterrows():
     dateVal = row["Date"].date()
     if dateVal < inflation_date:
         try:
-            inflationAdjusted[index] = float(cpi.inflate(row["Cost"], dateVal, to=inflation_date))
-        except:
+            cost = row["Cost"]
+            real_cost = cpi.inflate(cost, dateVal, to=inflation_date)
+            inflationAdjusted[index] = float(real_cost)
+        except Exception as ex:
             dropRows.append(index)
             continue
     else:
